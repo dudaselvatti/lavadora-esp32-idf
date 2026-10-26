@@ -1,0 +1,20 @@
+
+# Arquivos gerados pelo ESP-IDF
+build/
+sdkconfig.old
+
+# Configuracoes locais do editor
+.vscode/
+.clangd
+
+# Ambientes virtuais e arquivos temporarios
+.venv/
+venv/
+__pycache__/
+*.pyc
+*.log
+
+# Arquivos locais e sensiveis
+.env
+.env.*
+!.env.example

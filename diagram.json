@@ -1,0 +1,137 @@
+
+{
+  "version": 1,
+  "author": "Projeto Lavadora ESP32 - IFSP",
+  "editor": "wokwi",
+  "parts": [
+    {
+      "type": "board-esp32-devkit-c-v4",
+      "id": "esp",
+      "top": 20,
+      "left": 20,
+      "attrs": {}
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led1",
+      "top": 0,
+      "left": 390,
+      "attrs": {
+        "color": "yellow",
+        "label": "LED1 - Amarelo (Lavagem)"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led2",
+      "top": 105,
+      "left": 390,
+      "attrs": {
+        "color": "green",
+        "label": "LED2 - Verde (Enxague)"
+      }
+    },
+    {
+      "type": "wokwi-led",
+      "id": "led3",
+      "top": 210,
+      "left": 390,
+      "attrs": {
+        "color": "red",
+        "label": "LED3 - Vermelho (Centrifugacao)"
+      }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r1",
+      "top": -3,
+      "left": 495,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r2",
+      "top": 102,
+      "left": 495,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-resistor",
+      "id": "r3",
+      "top": 207,
+      "left": 495,
+      "rotate": 90,
+      "attrs": { "value": "220" }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "sw1",
+      "top": 30,
+      "left": -235,
+      "attrs": {
+        "color": "green",
+        "label": "B1 - Ligar/Confirmar/Iniciar/Pausar",
+        "key": "I"
+      }
+    },
+    {
+      "type": "wokwi-pushbutton",
+      "id": "sw2",
+      "top": 155,
+      "left": -235,
+      "attrs": {
+        "color": "red",
+        "label": "B2 - Voltar/Cancelar/Desligar",
+        "key": "C"
+      }
+    },
+    {
+      "type": "wokwi-potentiometer",
+      "id": "pot",
+      "top": 300,
+      "left": -210,
+      "attrs": {
+        "value": "512",
+        "label": "Programa de lavagem"
+      }
+    },
+    {
+      "type": "wokwi-buzzer",
+      "id": "buzzer",
+      "top": 350,
+      "left": 405,
+      "attrs": {
+        "volume": "0.5",
+        "label": "Avisos sonoros (PWM)"
+      }
+    }
+  ],
+  "connections": [
+    ["esp:16", "led1:C", "gold", []],
+    ["esp:17", "led2:C", "green", []],
+    ["esp:18", "led3:C", "red", []],
+
+    ["led1:A", "r1:1", "red", []],
+    ["led2:A", "r2:1", "red", []],
+    ["led3:A", "r3:1", "red", []],
+
+    ["r1:2", "esp:3V3", "red", []],
+    ["r2:2", "esp:3V3", "red", []],
+    ["r3:2", "esp:3V3", "red", []],
+
+    ["esp:32", "sw1:1.l", "green", []],
+    ["esp:3V3", "sw1:2.l", "red", []],
+
+    ["esp:33", "sw2:1.l", "orange", []],
+    ["esp:3V3", "sw2:2.l", "red", []],
+
+    ["esp:34", "pot:SIG", "green", []],
+    ["esp:3V3", "pot:VCC", "red", []],
+    ["esp:GND.1", "pot:GND", "black", []],
+
+    ["esp:25", "buzzer:2", "purple", []],
+    ["esp:GND.1", "buzzer:1", "black", []]
+  ]
+}
