@@ -5,7 +5,8 @@
 #include "esp_log.h"
 
 static const char *TAG = "LAVADORA";
-typedef struct {
+typedef struct
+{
     bool ativo;
     bool ligado;
     int total;
@@ -14,37 +15,58 @@ typedef struct {
     int intervalo_ms;
     int64_t proxima_ms;
     bool melodia;
+    bool boas_vindas;
     int indice_nota;
 } Som;
 
 // Pequeno jingle de conclusao, com notas musicais e pausas.
-typedef struct {
+typedef struct
+{
     uint32_t frequencia_hz;
     int duracao_ms;
     int pausa_ms;
 } NotaMelodia;
 
-// Do5, Mi5, Sol5, Do6, Sol5, Do6.
-static const NotaMelodia melodia_final[] = {
-    {523, 180, 60},
-    {659, 180, 60},
-    {784, 240, 80},
-    {1047, 430, 120},
-    {784, 200, 60},
-    {1047, 570, 0}
+
+ // Boas-vindas: melodia curta e delicada.
+static const NotaMelodia melodia_inicio[] = {
+    {392, 130, 45},  // Sol4
+    {523, 160, 50},  // Do5
+    {659, 160, 50},  // Mi5
+    {523, 260,  0}   // Do5
 };
 
-#define TOTAL_NOTAS ((int)(sizeof(melodia_final) / sizeof(melodia_final[0])))
+// Finalizacao: melodia alegre, com encerramento suave.
+static const NotaMelodia melodia_final[] = {
+    {523, 180, 40},  // Do5
+    {659, 180, 40},  // Mi5
+    {784, 260, 70},  // Sol5
 
+    {659, 160, 35},  // Mi5
+    {698, 180, 45},  // Fa5
+    {784, 240, 95},  // Sol5
+
+    {440, 160, 35},  // La4
+    {587, 180, 40},  // Re5
+    {698, 190, 50},  // Fa5
+    {659, 170, 40},  // Mi5
+
+    {784, 180, 40},  // Sol5
+    {587, 190, 40},  // Re5
+    {659, 220, 45},  // Mi5
+    {523, 560,  0}   // Do5 - nota final
+};
+
+#define TOTAL_NOTAS_INICIO ((int)(sizeof(melodia_inicio) / sizeof(melodia_inicio[0])))
+#define TOTAL_NOTAS_FINAL ((int)(sizeof(melodia_final) / sizeof(melodia_final[0])))
 
 static Som som = {0};
-
 
 static void saida_som(bool ligado)
 {
 #if BUZZER_USAR_PWM
     ESP_ERROR_CHECK(ledc_set_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0,
-                                  ligado ? 512 : 0));
+                                  ligado ? (som.melodia ? 205 : 512) : 0));
     ESP_ERROR_CHECK(ledc_update_duty(LEDC_LOW_SPEED_MODE, LEDC_CHANNEL_0));
 #else
     ESP_ERROR_CHECK(gpio_set_level(BUZZER, ligado ? 1 : 0));
@@ -76,66 +98,91 @@ void buzzer_iniciar_beeps(int quantidade, int duracao_ms, int intervalo_ms, int6
     saida_som(true);
 }
 
-// Toca a primeira nota; as seguintes sao gerenciadas pelo loop principal.
-void buzzer_iniciar_melodia_final(int64_t agora)
+// Inicia a primeira nota; as demais sao gerenciadas pelo loop principal.
+static void iniciar_melodia(const NotaMelodia *notas, bool boas_vindas, int64_t agora)
 {
     buzzer_parar();
     som.ativo = true;
     som.melodia = true;
+    som.boas_vindas = boas_vindas;
     som.ligado = true;
     som.indice_nota = 0;
-    som.proxima_ms = agora + melodia_final[0].duracao_ms;
+    som.proxima_ms = agora + notas[0].duracao_ms;
 #if BUZZER_USAR_PWM
     ESP_ERROR_CHECK(ledc_set_freq(LEDC_LOW_SPEED_MODE, LEDC_TIMER_0,
-                                  melodia_final[0].frequencia_hz));
+                                  notas[0].frequencia_hz));
 #endif
     saida_som(true);
 }
 
+void buzzer_iniciar_melodia_inicio(int64_t agora)
+{
+    iniciar_melodia(melodia_inicio, true, agora);
+}
+
+void buzzer_iniciar_melodia_final(int64_t agora)
+{
+    iniciar_melodia(melodia_final, false, agora);
+}
+
 void buzzer_atualizar(int64_t agora)
 {
-    if (!som.ativo || agora < som.proxima_ms) return;
+    if (!som.ativo || agora < som.proxima_ms)
+        return;
 
-    if (som.melodia) {
-        if (som.ligado) {
+    if (som.melodia)
+    {
+        const NotaMelodia *notas = som.boas_vindas ? melodia_inicio : melodia_final;
+        const int total_notas = som.boas_vindas ? TOTAL_NOTAS_INICIO : TOTAL_NOTAS_FINAL;
+        if (som.ligado)
+        {
             // Fim da nota atual: silencia durante a pausa entre notas.
             saida_som(false);
             som.ligado = false;
-            som.proxima_ms = agora + melodia_final[som.indice_nota].pausa_ms;
-        } else {
+            som.proxima_ms = agora + notas[som.indice_nota].pausa_ms;
+        }
+        else
+        {
             som.indice_nota++;
-            if (som.indice_nota >= TOTAL_NOTAS) {
+            if (som.indice_nota >= total_notas)
+            {
+                const bool inicio = som.boas_vindas;
                 buzzer_parar();
-                ESP_LOGI(TAG, "Melodia de finalizacao concluida");
+                ESP_LOGI(TAG, "%s",
+                         inicio ? "Melodia de boas-vindas concluida"
+                                : "Melodia de finalizacao concluida");
                 return;
             }
 #if BUZZER_USAR_PWM
             ESP_ERROR_CHECK(ledc_set_freq(LEDC_LOW_SPEED_MODE, LEDC_TIMER_0,
-                                          melodia_final[som.indice_nota].frequencia_hz));
+                                          notas[som.indice_nota].frequencia_hz));
 #endif
             saida_som(true);
             som.ligado = true;
-            som.proxima_ms = agora + melodia_final[som.indice_nota].duracao_ms;
+            som.proxima_ms = agora + notas[som.indice_nota].duracao_ms;
         }
         return;
     }
 
     // Padroes de beeps ja usados pelos outros estados da lavadora.
-    if (som.ligado) {
+    if (som.ligado)
+    {
         saida_som(false);
         som.ligado = false;
         som.concluidos++;
         som.proxima_ms = agora + som.intervalo_ms;
-    } else if (som.concluidos < som.total) {
+    }
+    else if (som.concluidos < som.total)
+    {
         saida_som(true);
         som.ligado = true;
         som.proxima_ms = agora + som.duracao_ms;
-    } else {
+    }
+    else
+    {
         som.ativo = false;
     }
 }
-
-
 
 bool buzzer_ativo(void)
 {
@@ -155,8 +202,7 @@ void buzzer_inicializar(void)
         .timer_num = LEDC_TIMER_0,
         .duty_resolution = LEDC_TIMER_10_BIT,
         .freq_hz = 2000,
-        .clk_cfg = LEDC_AUTO_CLK
-    };
+        .clk_cfg = LEDC_AUTO_CLK};
     ESP_ERROR_CHECK(ledc_timer_config(&timer));
     ledc_channel_config_t canal = {
         .gpio_num = BUZZER,
@@ -164,8 +210,7 @@ void buzzer_inicializar(void)
         .channel = LEDC_CHANNEL_0,
         .timer_sel = LEDC_TIMER_0,
         .duty = 0,
-        .hpoint = 0
-    };
+        .hpoint = 0};
     ESP_ERROR_CHECK(ledc_channel_config(&canal));
 #else
     gpio_config_t cfg_buzzer = {
@@ -173,8 +218,7 @@ void buzzer_inicializar(void)
         .mode = GPIO_MODE_OUTPUT,
         .pull_up_en = GPIO_PULLUP_DISABLE,
         .pull_down_en = GPIO_PULLDOWN_DISABLE,
-        .intr_type = GPIO_INTR_DISABLE
-    };
+        .intr_type = GPIO_INTR_DISABLE};
     ESP_ERROR_CHECK(gpio_config(&cfg_buzzer));
     ESP_ERROR_CHECK(gpio_set_level(BUZZER, 0));
 #endif
