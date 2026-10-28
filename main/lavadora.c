@@ -120,6 +120,7 @@ static void tratar_botao_1(int64_t agora)
         case DESLIGADA:
             ESP_LOGI(TAG, "Lavadora ligada");
             entrar_selecao(agora);
+            buzzer_iniciar_melodia_inicio(agora);
             break;
         case SELECAO:
             estado = CONFIRMADO;
