@@ -1,5 +1,13 @@
 idf_component_register(
-    SRCS "lavadora_esp32_idf.c"
+    SRCS
+        "main.c"
+        "lavadora.c"
+        "programas.c"
+        "botoes.c"
+        "potenciometro.c"
+        "leds.c"
+        "buzzer.c"
+        "nvs_ciclo.c"
     INCLUDE_DIRS "."
     PRIV_REQUIRES
         esp_driver_gpio

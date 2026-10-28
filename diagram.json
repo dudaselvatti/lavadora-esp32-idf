@@ -1,4 +1,3 @@
-
 {
   "version": 1,
   "author": "Projeto Lavadora ESP32 - IFSP",
@@ -47,7 +46,9 @@
       "top": -3,
       "left": 495,
       "rotate": 90,
-      "attrs": { "value": "220" }
+      "attrs": {
+        "value": "220"
+      }
     },
     {
       "type": "wokwi-resistor",
@@ -55,7 +56,9 @@
       "top": 102,
       "left": 495,
       "rotate": 90,
-      "attrs": { "value": "220" }
+      "attrs": {
+        "value": "220"
+      }
     },
     {
       "type": "wokwi-resistor",
@@ -63,7 +66,9 @@
       "top": 207,
       "left": 495,
       "rotate": 90,
-      "attrs": { "value": "220" }
+      "attrs": {
+        "value": "220"
+      }
     },
     {
       "type": "wokwi-pushbutton",
@@ -109,29 +114,113 @@
     }
   ],
   "connections": [
-    ["esp:16", "led1:C", "gold", []],
-    ["esp:17", "led2:C", "green", []],
-    ["esp:18", "led3:C", "red", []],
-
-    ["led1:A", "r1:1", "red", []],
-    ["led2:A", "r2:1", "red", []],
-    ["led3:A", "r3:1", "red", []],
-
-    ["r1:2", "esp:3V3", "red", []],
-    ["r2:2", "esp:3V3", "red", []],
-    ["r3:2", "esp:3V3", "red", []],
-
-    ["esp:32", "sw1:1.l", "green", []],
-    ["esp:3V3", "sw1:2.l", "red", []],
-
-    ["esp:33", "sw2:1.l", "orange", []],
-    ["esp:3V3", "sw2:2.l", "red", []],
-
-    ["esp:34", "pot:SIG", "green", []],
-    ["esp:3V3", "pot:VCC", "red", []],
-    ["esp:GND.1", "pot:GND", "black", []],
-
-    ["esp:25", "buzzer:2", "purple", []],
-    ["esp:GND.1", "buzzer:1", "black", []]
+    [
+      "esp:18",
+      "led1:C",
+      "gold",
+      []
+    ],
+    [
+      "esp:17",
+      "led2:C",
+      "green",
+      []
+    ],
+    [
+      "esp:16",
+      "led3:C",
+      "red",
+      []
+    ],
+    [
+      "led1:A",
+      "r1:1",
+      "red",
+      []
+    ],
+    [
+      "led2:A",
+      "r2:1",
+      "red",
+      []
+    ],
+    [
+      "led3:A",
+      "r3:1",
+      "red",
+      []
+    ],
+    [
+      "r1:2",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "r2:2",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "r3:2",
+      "esp:3V3",
+      "red",
+      []
+    ],
+    [
+      "esp:32",
+      "sw1:1.l",
+      "green",
+      []
+    ],
+    [
+      "esp:3V3",
+      "sw1:2.l",
+      "red",
+      []
+    ],
+    [
+      "esp:33",
+      "sw2:1.l",
+      "orange",
+      []
+    ],
+    [
+      "esp:3V3",
+      "sw2:2.l",
+      "red",
+      []
+    ],
+    [
+      "esp:34",
+      "pot:SIG",
+      "green",
+      []
+    ],
+    [
+      "esp:3V3",
+      "pot:VCC",
+      "red",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "pot:GND",
+      "black",
+      []
+    ],
+    [
+      "esp:25",
+      "buzzer:2",
+      "purple",
+      []
+    ],
+    [
+      "esp:GND.1",
+      "buzzer:1",
+      "black",
+      []
+    ]
   ]
 }
