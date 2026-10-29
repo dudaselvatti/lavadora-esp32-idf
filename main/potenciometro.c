@@ -10,8 +10,7 @@ void potenciometro_inicializar(void)
     ESP_ERROR_CHECK(adc_oneshot_new_unit(&cfg_adc, &adc));
     adc_oneshot_chan_cfg_t cfg_canal = {
         .atten = ADC_ATTEN_DB_12,
-        .bitwidth = ADC_BITWIDTH_12
-    };
+        .bitwidth = ADC_BITWIDTH_12};
     ESP_ERROR_CHECK(adc_oneshot_config_channel(adc, ADC_POT, &cfg_canal));
 }
 
@@ -24,21 +23,34 @@ int potenciometro_ler(void)
 
 int potenciometro_selecionar_programa(int valor, int atual)
 {
-    if (atual < 0) {
-        if (valor < 1365) return 0;
-        if (valor < 2730) return 1;
+    if (atual < 0)
+    {
+        if (valor < 1365)
+            return 0;
+        if (valor < 2730)
+            return 1;
         return 2;
     }
-    if (atual == 0) {
-        if (valor > 2730 + HISTERESE_ADC) return 2;
-        if (valor > 1365 + HISTERESE_ADC) return 1;
-    } else if (atual == 1) {
-        if (valor < 1365 - HISTERESE_ADC) return 0;
-        if (valor > 2730 + HISTERESE_ADC) return 2;
-    } else {
-        if (valor < 1365 - HISTERESE_ADC) return 0;
-        if (valor < 2730 - HISTERESE_ADC) return 1;
+    if (atual == 0)
+    {
+        if (valor > 2730 + HISTERESE_ADC)
+            return 2;
+        if (valor > 1365 + HISTERESE_ADC)
+            return 1;
+    }
+    else if (atual == 1)
+    {
+        if (valor < 1365 - HISTERESE_ADC)
+            return 0;
+        if (valor > 2730 + HISTERESE_ADC)
+            return 2;
+    }
+    else
+    {
+        if (valor < 1365 - HISTERESE_ADC)
+            return 0;
+        if (valor < 2730 - HISTERESE_ADC)
+            return 1;
     }
     return atual;
 }
-

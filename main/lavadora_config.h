@@ -20,6 +20,6 @@
 #define HISTERESE_ADC   50
 #define CHECKPOINT_MS   2000
 #define NVS_ASSINATURA  0x4C415641UL  // "LAVA"
-#define NVS_VERSAO      1
+#define NVS_VERSAO 2
 
 #endif

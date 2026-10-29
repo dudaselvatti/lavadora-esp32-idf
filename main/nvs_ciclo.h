@@ -6,12 +6,15 @@
 
 typedef struct {
     uint32_t assinatura;
-    uint32_t versao;
-    uint32_t programa;
-    uint32_t etapa;
-    uint32_t restante_ms;
-    uint32_t estava_pausado;
+    uint16_t restante_ms;
+    uint8_t versao;
+    uint8_t programa;
+    uint8_t etapa;
+    uint8_t estava_pausado;
 } RegistroNVS;
+
+_Static_assert(sizeof(RegistroNVS) == 12,
+               "Tamanho inesperado do registro NVS");
 
 void nvs_ciclo_inicializar(void);
 bool nvs_ciclo_carregar(RegistroNVS *registro);
